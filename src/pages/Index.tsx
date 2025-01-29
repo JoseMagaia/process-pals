@@ -1,61 +1,67 @@
 import { Header } from "@/components/Header";
-import { ProcessCard } from "@/components/ProcessCard";
-import { CategoryFilter } from "@/components/CategoryFilter";
+import { FeedPost } from "@/components/FeedPost";
+import { ProcessBuilder } from "@/components/ProcessBuilder";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 
-const featuredProcesses = [
+const SAMPLE_POSTS = [
   {
-    title: "How I Got Into Harvard",
-    description: "A step-by-step guide to my successful application process",
-    category: "College Admissions",
-    mentorName: "Sarah Chen",
-    mentorImage: "/placeholder.svg",
+    author: {
+      name: "Sarah Chen",
+      image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+    },
+    content: "Just published my Harvard application success story! Check out my process shop for the complete guide 📚",
+    timestamp: "2 hours ago",
+    likes: 24,
+    comments: 5,
   },
   {
-    title: "Fulbright Scholarship Success",
-    description: "My journey to winning the Fulbright scholarship",
-    category: "Scholarships",
-    mentorName: "James Wilson",
-    mentorImage: "/placeholder.svg",
-  },
-  {
-    title: "UK Student Visa Guide",
-    description: "Complete process for UK student visa application",
-    category: "Visa Applications",
-    mentorName: "Priya Patel",
-    mentorImage: "/placeholder.svg",
+    author: {
+      name: "James Wilson",
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+    },
+    content: "New video tutorial on Fulbright Scholarship application tips is now live in my process shop! 🎓",
+    timestamp: "5 hours ago",
+    likes: 42,
+    comments: 8,
   },
 ];
 
 const Index = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const filteredProcesses = selectedCategory === "All"
-    ? featuredProcesses
-    : featuredProcesses.filter(p => p.category === selectedCategory);
+  const [showProcessBuilder, setShowProcessBuilder] = useState(false);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">
-            Learn From Those Who Succeeded
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Connect with mentors who have successfully completed the process you're starting
-          </p>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Left Sidebar */}
+          <div className="space-y-4">
+            <Button
+              onClick={() => setShowProcessBuilder(!showProcessBuilder)}
+              className="w-full gap-2"
+            >
+              <PlusCircle className="w-4 h-4" />
+              Create Process
+            </Button>
+          </div>
 
-        <CategoryFilter
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProcesses.map((process, index) => (
-            <ProcessCard key={index} {...process} />
-          ))}
+          {/* Main Feed */}
+          <div className="md:col-span-2">
+            {showProcessBuilder ? (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-2xl font-bold mb-6">Create Your Process</h2>
+                <ProcessBuilder />
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {SAMPLE_POSTS.map((post, index) => (
+                  <FeedPost key={index} {...post} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
