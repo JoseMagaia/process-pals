@@ -1,9 +1,122 @@
 import { Header } from "@/components/Header";
 import { FeedPost } from "@/components/FeedPost";
-import { ProcessBuilder } from "@/components/ProcessBuilder";
+import { CategoryFilter } from "@/components/CategoryFilter";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Search } from "lucide-react";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+
+const Index = () => {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session?.user?.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isMentor = profile?.user_type === 'mentor';
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          {/* Left Sidebar */}
+          <div className="md:col-span-3 space-y-6">
+            <div className="bg-white rounded-lg shadow p-4">
+              {session ? (
+                <>
+                  <h3 className="font-semibold mb-2">Welcome back!</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {isMentor ? "Share your knowledge" : "Find guidance"}
+                  </p>
+                  {isMentor && (
+                    <Button
+                      onClick={() => navigate("/create")}
+                      className="w-full gap-2"
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                      Create Post
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Join ProcessPal to connect with mentors and share experiences
+                  </p>
+                  <Button
+                    onClick={() => navigate("/auth")}
+                    className="w-full"
+                  >
+                    Get Started
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="md:col-span-6">
+            <div className="mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search processes..."
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <CategoryFilter
+              selected={selectedCategory}
+              onSelect={setSelectedCategory}
+            />
+
+            <div className="space-y-6">
+              {SAMPLE_POSTS.map((post, index) => (
+                <FeedPost key={index} {...post} />
+              ))}
+            </div>
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="md:col-span-3">
+            <div className="bg-white rounded-lg shadow p-4">
+              <h3 className="font-semibold mb-4">Top Mentors</h3>
+              {/* Add mentor list here */}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
 
 const SAMPLE_POSTS = [
   {
@@ -29,45 +142,5 @@ const SAMPLE_POSTS = [
     comments: 8,
   },
 ];
-
-const Index = () => {
-  const [showProcessBuilder, setShowProcessBuilder] = useState(false);
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Left Sidebar */}
-          <div className="space-y-4">
-            <Button
-              onClick={() => setShowProcessBuilder(!showProcessBuilder)}
-              className="w-full gap-2"
-            >
-              <PlusCircle className="w-4 h-4" />
-              Create Process
-            </Button>
-          </div>
-
-          {/* Main Feed */}
-          <div className="md:col-span-2">
-            {showProcessBuilder ? (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-2xl font-bold mb-6">Create Your Process</h2>
-                <ProcessBuilder />
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {SAMPLE_POSTS.map((post, index) => (
-                  <FeedPost key={index} {...post} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-};
 
 export default Index;
