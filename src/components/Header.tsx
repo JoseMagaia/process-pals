@@ -60,9 +60,9 @@ export const Header = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
-                    <AvatarImage src={profile?.avatar_url} />
+                    <AvatarImage src={profile?.avatar_url ?? undefined} />
                     <AvatarFallback>
-                      {profile?.full_name?.[0] || "U"}
+                      {profile?.full_name?.[0] ?? "U"}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
