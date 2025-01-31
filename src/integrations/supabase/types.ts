@@ -48,7 +48,90 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["id"]
+          }
+        ]
+      }
+      flow_chart_items: {
+        Row: {
+          id: string
+          post_id: string
+          content: string | null
+          media_url: string | null
+          item_type: "text" | "picture"
+          position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          content?: string | null
+          media_url?: string | null
+          item_type: "text" | "picture"
+          position: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          content?: string | null
+          media_url?: string | null
+          item_type?: "text" | "picture"
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_chart_items_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      flow_item_comments: {
+        Row: {
+          id: string
+          flow_item_id: string
+          author_id: string
+          content: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          flow_item_id: string
+          author_id: string
+          content: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          flow_item_id?: string
+          author_id?: string
+          content?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flow_item_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "flow_item_comments_flow_item_id_fkey"
+            columns: ["flow_item_id"]
+            isOneToOne: false
+            referencedRelation: "flow_chart_items"
+            referencedColumns: ["id"]
+          }
         ]
       }
       follows: {
@@ -84,7 +167,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       likes: {
@@ -120,7 +203,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       messages: {
@@ -162,7 +245,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       notifications: {
@@ -197,7 +280,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       posts: {
@@ -241,7 +324,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       profiles: {
@@ -264,7 +347,7 @@ export type Database = {
           expertise?: string[] | null
           full_name?: string | null
           id: string
-          updated_at?: string
+          updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Update: {
@@ -288,6 +371,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      flow_item_type: "text" | "picture"
       user_type: "mentor" | "mentee" | "admin"
     }
     CompositeTypes: {
@@ -305,7 +389,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -359,10 +443,10 @@ export type TablesUpdate<
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
+      Update: infer U
+    }
+    ? U
+    : never
     : never
 
 export type Enums<

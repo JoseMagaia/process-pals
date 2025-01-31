@@ -1,8 +1,52 @@
 import { Header } from "@/components/Header";
 import { FeedPost } from "@/components/FeedPost";
-import { Button } from "@/components/ui/button";
-import { useParams } from "react-router-dom";
-import { MessageSquare } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+const Profile = () => {
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', session?.user?.id],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session?.user?.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-4">{profile?.full_name}</h1>
+        <p className="text-gray-600 mb-4">{profile?.bio}</p>
+        
+        <div className="space-y-6 mt-8">
+          {SAMPLE_POSTS.map((post, index) => (
+            <FeedPost 
+              key={index} 
+              {...post} 
+              postId={`profile-${index}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const SAMPLE_POSTS = [
   {
@@ -16,64 +60,17 @@ const SAMPLE_POSTS = [
     likes: 24,
     comments: 5,
   },
+  {
+    author: {
+      name: "James Wilson",
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+    },
+    content: "New video tutorial on Fulbright Scholarship application tips is now live in my process shop! 🎓",
+    postImage: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+    timestamp: "5 hours ago",
+    likes: 42,
+    comments: 8,
+  },
 ];
-
-const Profile = () => {
-  const { username } = useParams();
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center gap-6">
-            <div className="w-24 h-24 rounded-full overflow-hidden">
-              <img
-                src={SAMPLE_POSTS[0].author.image}
-                alt={username}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-2">{username}</h1>
-              <p className="text-gray-600 mb-4">
-                Helping students achieve their dreams through proven application strategies
-              </p>
-              <div className="flex gap-4">
-                <Button className="gap-2">
-                  <MessageSquare className="w-4 h-4" />
-                  Message
-                </Button>
-                <Button variant="outline">View Process Shop</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2">
-            <h2 className="text-xl font-semibold mb-4">Posts</h2>
-            <div className="space-y-6">
-              {SAMPLE_POSTS.map((post, index) => (
-                <FeedPost key={index} {...post} />
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="font-semibold mb-4">About</h3>
-              <div className="space-y-2 text-sm">
-                <p>🎓 Harvard University '22</p>
-                <p>📚 Application Mentor</p>
-                <p>💡 Helped 50+ students</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-};
 
 export default Profile;

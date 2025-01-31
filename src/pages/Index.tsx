@@ -100,7 +100,11 @@ const Index = () => {
 
             <div className="space-y-6">
               {SAMPLE_POSTS.map((post, index) => (
-                <FeedPost key={index} {...post} />
+                <FeedPost 
+                  key={index} 
+                  {...post} 
+                  postId={`sample-${index}`}
+                />
               ))}
             </div>
           </div>

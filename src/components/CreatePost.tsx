@@ -3,7 +3,6 @@ import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -44,7 +43,6 @@ export const CreatePost = () => {
     const [movedItem] = newItems.splice(oldIndex, 1);
     newItems.splice(newIndex, 0, movedItem);
 
-    // Update positions
     const updatedItems = newItems.map((item, index) => ({
       ...item,
       position: index,
@@ -76,17 +74,17 @@ export const CreatePost = () => {
       if (postError) throw postError;
 
       // Create flow chart items
+      const flowItems = items.map(item => ({
+        post_id: post.id,
+        content: item.content || null,
+        media_url: item.mediaUrl || null,
+        item_type: item.type,
+        position: item.position,
+      }));
+
       const { error: itemsError } = await supabase
         .from("flow_chart_items")
-        .insert(
-          items.map(item => ({
-            post_id: post.id,
-            content: item.content,
-            media_url: item.mediaUrl,
-            item_type: item.type,
-            position: item.position,
-          }))
-        );
+        .insert(flowItems);
 
       if (itemsError) throw itemsError;
 
