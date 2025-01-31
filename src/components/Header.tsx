@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, PlusCircle } from "lucide-react";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -52,11 +52,13 @@ export const Header = () => {
           {session ? (
             <>
               <Link to="/browse">Browse</Link>
-              {profile?.user_type === "mentor" && (
-                <Link to="/create">
-                  <Button>Share Your Process</Button>
-                </Link>
-              )}
+              <Button
+                onClick={() => navigate("/create")}
+                className="gap-2"
+              >
+                <PlusCircle className="w-4 h-4" />
+                Create Post
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
