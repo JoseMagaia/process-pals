@@ -25,22 +25,6 @@ const Index = () => {
           profiles:author_id (
             full_name,
             avatar_url
-          ),
-          flow_chart_items (
-            id,
-            content,
-            media_url,
-            item_type,
-            position,
-            flow_item_comments (
-              id,
-              content,
-              created_at,
-              profiles (
-                full_name,
-                avatar_url
-              )
-            )
           )
         `)
         .order('created_at', { ascending: false });
@@ -115,7 +99,6 @@ const Index = () => {
                   timestamp={new Date(post.created_at).toLocaleDateString()}
                   likes={0}
                   comments={0}
-                  flowItems={post.flow_chart_items}
                 />
               ))}
             </div>
