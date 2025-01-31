@@ -65,7 +65,7 @@ export const CreatePost = () => {
         .insert({
           title,
           author_id: user.id,
-          content: "Flow chart post",
+          content: title, // Using title as content for consistency
           category: "process",
         })
         .select()
@@ -161,7 +161,7 @@ export const CreatePost = () => {
       </DndContext>
 
       <Button onClick={handleSubmit} className="w-full">
-        Create Post
+        Post
       </Button>
     </div>
   );
